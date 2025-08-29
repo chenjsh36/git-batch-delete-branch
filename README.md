@@ -1,6 +1,8 @@
-# Git Batch Delete Branch
+# Git Branch Clean
 
 A powerful CLI tool for batch deleting Git local branches with interactive selection and advanced filtering options.
+
+> **Alias**: `git-batch-delete-branch` (full name) | `git-branch-clean` (short name)
 
 ## Features
 
@@ -17,13 +19,13 @@ A powerful CLI tool for batch deleting Git local branches with interactive selec
 ### Global Installation
 
 ```bash
-npm install -g git-batch-delete-branch
+npm install -g @shopee/git-batch-delete-branch
 ```
 
 ### Local Installation
 
 ```bash
-npm install git-batch-delete-branch
+npm install @shopee/git-batch-delete-branch
 ```
 
 ## Usage
@@ -33,6 +35,8 @@ npm install git-batch-delete-branch
 Run the tool without any options to enter interactive mode:
 
 ```bash
+git-branch-clean
+# or
 git-batch-delete-branch
 ```
 
@@ -44,13 +48,13 @@ Delete branches containing a specific keyword:
 
 ```bash
 # Delete branches containing "feature"
-git-batch-delete-branch --filter "feature"
+git-branch-clean --filter "feature"
 
 # Delete branches containing "test" (case insensitive)
-git-batch-delete-branch -f "test"
+git-branch-clean -f "test"
 
 # Exclude branches containing "main"
-git-batch-delete-branch --filter "main" --exclude
+git-branch-clean --filter "main" --exclude
 ```
 
 ### Regex Filtering
@@ -59,13 +63,13 @@ Use regular expressions for advanced filtering:
 
 ```bash
 # Delete branches matching pattern
-git-batch-delete-branch --regex "feature/.*"
+git-branch-clean --regex "feature/.*"
 
 # Delete branches matching case-sensitive pattern
-git-batch-delete-branch -r "RELEASE-.*"
+git-branch-clean -r "RELEASE-.*"
 
 # Exclude branches matching pattern
-git-batch-delete-branch --regex "hotfix/.*" --exclude
+git-branch-clean --regex "hotfix/.*" --exclude
 ```
 
 ### Preview Mode
@@ -73,7 +77,7 @@ git-batch-delete-branch --regex "hotfix/.*" --exclude
 Preview what would be deleted without actually deleting:
 
 ```bash
-git-batch-delete-branch --filter "old" --dry-run
+git-branch-clean --filter "old" --dry-run
 ```
 
 ### Force Deletion
@@ -81,7 +85,7 @@ git-batch-delete-branch --filter "old" --dry-run
 Skip confirmation prompts:
 
 ```bash
-git-batch-delete-branch --filter "temp" --force
+git-branch-clean --filter "temp" --force
 ```
 
 ### Include Merged Branches

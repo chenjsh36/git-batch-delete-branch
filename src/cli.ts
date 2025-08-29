@@ -16,7 +16,7 @@ program.version(packageJson.version);
 
 // 主命令
 program
-  .name('git-batch-delete-branch')
+  .name('git-branch-clean')
   .description('A CLI tool for batch deleting Git local branches with interactive selection and filtering options')
   .option('-f, --filter <keyword>', 'Filter branches by keyword')
   .option('-r, --regex <pattern>', 'Filter branches by regex pattern')

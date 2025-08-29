@@ -14,7 +14,7 @@ export class Display {
 
     logger.info(`Found ${branches.length} branches:\n`);
 
-    branches.forEach((branch, index) => {
+    branches.forEach((branch) => {
       const prefix = this.getBranchPrefix(branch);
       const name = this.formatBranchName(branch);
       const details = showDetails ? this.getBranchDetails(branch) : '';
@@ -51,7 +51,7 @@ export class Display {
     }
 
     console.log('\n' + chalk.yellow('⚠️  BRANCHES TO BE DELETED:'));
-    branches.forEach((branch, index) => {
+    branches.forEach((branch) => {
       const prefix = chalk.red('🗑️');
       const name = this.formatBranchName(branch);
       console.log(`${prefix} ${name}`);

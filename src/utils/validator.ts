@@ -1,5 +1,4 @@
 import { execSync } from 'child_process';
-import { logger } from './logger';
 
 export class Validator {
   /**

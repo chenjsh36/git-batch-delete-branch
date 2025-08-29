@@ -7,18 +7,12 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
   ],
   rules: {
-    '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-inferrable-types': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'warn',
+    'no-unused-vars': 'warn',
+    'no-console': 'off', // Allow console for CLI tool
     'prefer-const': 'error',
     'no-var': 'error',
-    'no-console': 'off', // Allow console for CLI tool
   },
   env: {
     node: true,

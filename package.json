@@ -1,10 +1,11 @@
 {
-  "name": "git-batch-delete-branch",
+  "name": "@shopee/git-batch-delete-branch",
   "version": "1.0.0",
   "description": "A CLI tool for batch deleting Git local branches with interactive selection and filtering options",
   "main": "dist/index.js",
   "bin": {
-    "git-batch-delete-branch": "dist/cli.js"
+    "git-batch-delete-branch": "dist/cli.js",
+    "git-branch-clean": "dist/cli.js"
   },
   "scripts": {
     "build": "tsup",
@@ -29,16 +30,16 @@
     "typescript",
     "node"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Jiansheng Chen <chenjsh36@outlook.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/git-batch-delete-branch.git"
+    "url": "https://github.com/chenjsh36/git-batch-delete-branch.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/git-batch-delete-branch/issues"
+    "url": "https://github.com/chenjsh36/git-batch-delete-branch/issues"
   },
-  "homepage": "https://github.com/yourusername/git-batch-delete-branch#readme",
+  "homepage": "https://github.com/chenjsh36/git-batch-delete-branch#readme",
   "engines": {
     "node": ">=14.0.0"
   },

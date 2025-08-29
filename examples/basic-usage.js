@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Basic usage example for git-batch-delete-branch
+ * Basic usage example for git-branch-clean
  * This example demonstrates how to use the package programmatically
  */
 
@@ -13,7 +13,7 @@ async function example() {
     const branchManager = new BranchManager();
     await branchManager.initialize();
 
-    console.log('=== Git Batch Delete Branch - Basic Usage Example ===\n');
+    console.log('=== Git Branch Clean - Basic Usage Example ===\n');
 
     // Get all branches
     const allBranches = branchManager.getAllBranches();
