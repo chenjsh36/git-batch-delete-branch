@@ -238,4 +238,37 @@ export class BranchManager {
       logger.warning('This was a dry run. No branches were actually deleted.');
     }
   }
+
+  /**
+   * 切换分支
+   */
+  async switchBranch(branchName: string): Promise<boolean> {
+    try {
+      // 检查分支是否存在
+      if (!this.branches.find(branch => branch.name === branchName)) {
+        logger.error(`Branch '${branchName}' does not exist`);
+        return false;
+      }
+
+      // 检查是否已经是当前分支
+      const currentBranch = this.getCurrentBranch();
+      if (currentBranch && currentBranch.name === branchName) {
+        logger.info(`Already on branch '${branchName}'`);
+        return true;
+      }
+
+      // 执行分支切换
+      const success = GitUtils.switchBranch(branchName);
+      
+      if (success) {
+        // 刷新分支列表以更新当前分支状态
+        await this.refreshBranches();
+      }
+      
+      return success;
+    } catch (error) {
+      logger.error(`Failed to switch to branch '${branchName}': ${error}`);
+      return false;
+    }
+  }
 }

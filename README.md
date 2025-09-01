@@ -1,17 +1,19 @@
-# Git Branch Clean
+# Git Branch Manager
 
-A powerful CLI tool for batch deleting Git local branches with interactive selection and advanced filtering options.
+A powerful CLI tool for managing Git branches with interactive delete and switch operations.
 
-> **Alias**: `git-batch-delete-branch` (full name) | `git-branch-clean` (short name)
+> **Command**: `gitt branch` - Interactive branch management
 
 ## Features
 
-- 🎯 **Interactive Selection**: Choose branches to delete with a user-friendly interface
+- 🎯 **Interactive Branch Management**: Choose between delete and switch operations
+- 🗑️ **Batch Delete**: Choose branches to delete with a user-friendly interface
+- 🔄 **Branch Switch**: Easily switch between branches with visual selection
 - 🔍 **Keyword Filtering**: Filter branches by keyword with various matching options
 - 📝 **Regex Filtering**: Use regular expressions for advanced branch filtering
 - 🛡️ **Safety Features**: Automatic protection of current and main branches
 - 👀 **Preview Mode**: Preview deletions before executing them
-- 📊 **Statistics**: View detailed branch statistics and deletion results
+- 📊 **Statistics**: View detailed branch statistics and operation results
 - 🎨 **Beautiful UI**: Colored output and progress indicators
 
 ## Installation
@@ -28,33 +30,40 @@ npm install -g @shopee/git-batch-delete-branch
 npm install @shopee/git-batch-delete-branch
 ```
 
+> **Note**: After installation, you can use `gitt branch` command for interactive branch management.
+
 ## Usage
 
-### Interactive Mode
+### Interactive Branch Management
 
-Run the tool without any options to enter interactive mode:
+Run the main command to enter interactive mode:
 
 ```bash
-git-branch-clean
-# or
-git-batch-delete-branch
+git branch
 ```
 
-This will show you all available branches and let you select which ones to delete.
+This will show you branch statistics and let you choose between:
+- 🗑️ **Delete branches** - Batch delete selected branches
+- 🔄 **Switch branch** - Change to a different branch
 
-### Keyword Filtering
+### Delete Mode
 
-Delete branches containing a specific keyword:
+#### Interactive Selection
+```bash
+gitt branch
+# Then select "Delete branches" option
+```
 
+#### Keyword Filtering
 ```bash
 # Delete branches containing "feature"
-git-branch-clean --filter "feature"
+git delete --filter "feature"
 
 # Delete branches containing "test" (case insensitive)
-git-branch-clean -f "test"
+git delete -f "test"
 
 # Exclude branches containing "main"
-git-branch-clean --filter "main" --exclude
+git delete --filter "main" --exclude
 ```
 
 ### Regex Filtering
@@ -63,13 +72,13 @@ Use regular expressions for advanced filtering:
 
 ```bash
 # Delete branches matching pattern
-git-branch-clean --regex "feature/.*"
+git delete --regex "feature/.*"
 
 # Delete branches matching case-sensitive pattern
-git-branch-clean -r "RELEASE-.*"
+git delete -r "RELEASE-.*"
 
 # Exclude branches matching pattern
-git-branch-clean --regex "hotfix/.*" --exclude
+git delete --regex "hotfix/.*" --exclude
 ```
 
 ### Preview Mode
@@ -77,7 +86,7 @@ git-branch-clean --regex "hotfix/.*" --exclude
 Preview what would be deleted without actually deleting:
 
 ```bash
-git-branch-clean --filter "old" --dry-run
+git delete --filter "old" --dry-run
 ```
 
 ### Force Deletion
@@ -85,8 +94,19 @@ git-branch-clean --filter "old" --dry-run
 Skip confirmation prompts:
 
 ```bash
-git-branch-clean --filter "temp" --force
+git delete --filter "temp" --force
 ```
+
+### Switch Mode
+
+Switch to a different branch:
+
+```bash
+gitt branch
+# Then select "Switch branch" option
+```
+
+This will show you all available branches and let you select which one to switch to.
 
 ### Include Merged Branches
 
@@ -104,6 +124,13 @@ Get detailed information about the process:
 git-batch-delete-branch --verbose
 ```
 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `gitt branch` | Interactive branch management (delete or switch) |
+| `gitt delete` | Delete branches with filtering options |
+
 ## Options
 
 | Option | Short | Description |
@@ -120,44 +147,64 @@ git-batch-delete-branch --verbose
 
 ## Examples
 
+### Interactive Branch Management
+
+```bash
+# Start interactive mode
+gitt branch
+
+# You'll see options:
+# 🗑️  Delete branches (batch delete)
+# 🔄 Switch branch (change current branch)
+```
+
 ### Delete Feature Branches
 
 ```bash
 # Delete all feature branches
-git-batch-delete-branch --filter "feature"
+git delete --filter "feature"
 
 # Delete only merged feature branches
-git-batch-delete-branch --filter "feature" --include-merged
+git delete --filter "feature" --include-merged
 ```
 
 ### Delete Test Branches
 
 ```bash
 # Delete branches containing "test"
-git-batch-delete-branch --filter "test"
+git delete --filter "test"
 
 # Preview test branch deletion
-git-batch-delete-branch --filter "test" --dry-run
+git delete --filter "test" --dry-run
 ```
 
 ### Delete Old Release Branches
 
 ```bash
 # Delete release branches older than v1.0
-git-batch-delete-branch --regex "release-v0\..*"
+git delete --regex "release-v0\..*"
 
 # Delete all release branches except the latest
-git-batch-delete-branch --regex "release-.*" --exclude
+git delete --regex "release-.*" --exclude
 ```
 
 ### Clean Up Temporary Branches
 
 ```bash
 # Delete temporary branches
-git-batch-delete-branch --filter "temp"
+git delete --filter "temp"
 
 # Delete branches with specific naming pattern
-git-batch-delete-branch --regex "temp-.*|tmp-.*"
+git delete --regex "temp-.*|tmp-.*"
+```
+
+### Switch Between Branches
+
+```bash
+# Interactive branch switching
+gitt branch
+# Select "Switch branch" option
+# Choose from the list of available branches
 ```
 
 ## Safety Features
@@ -177,10 +224,11 @@ The tool uses visual indicators to show branch status:
 - ✓ `✓` - Merged branch
 - ○ `○` - Unmerged branch
 - 🗑️ `🗑️` - Branch to be deleted
+- 🔄 `🔄` - Branch to be switched to
 
 ## Output Examples
 
-### Interactive Selection
+### Interactive Branch Management
 
 ```
 📊 BRANCH STATISTICS:
@@ -190,6 +238,14 @@ Protected branches: 2
 Merged branches: 3
 Unmerged branches: 5
 
+What would you like to do with branches?
+🗑️  Delete branches (batch delete)
+🔄 Switch branch (change current branch)
+```
+
+### Branch Selection for Deletion
+
+```
 Found 5 branches:
 
 ○ feature/new-feature
@@ -228,7 +284,7 @@ Failed to delete: 1
 ### Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/chenjsh36/git-batch-delete-branch.git
 cd git-batch-delete-branch
 npm install
 ```
@@ -274,7 +330,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and changes.
 If you encounter any issues or have questions, please:
 
 1. Check the [documentation](README.md)
-2. Search [existing issues](https://github.com/yourusername/git-batch-delete-branch/issues)
+2. Search [existing issues](https://github.com/chenjsh36/git-batch-delete-branch/issues)
 3. Create a new issue with detailed information
 
 ## Related Projects

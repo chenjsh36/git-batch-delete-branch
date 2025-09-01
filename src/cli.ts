@@ -16,8 +16,26 @@ program.version(packageJson.version);
 
 // 主命令
 program
-  .name('git-branch-clean')
-  .description('A CLI tool for batch deleting Git local branches with interactive selection and filtering options')
+  .name('gitt')
+  .description('Git branch management tool with interactive delete and switch options');
+
+// branch 子命令
+program
+  .command('branch')
+  .description('Manage Git branches')
+  .action(async () => {
+    try {
+      await runBranchManager();
+    } catch (error) {
+      logger.error(error instanceof Error ? error.message : 'An unknown error occurred');
+      process.exit(1);
+    }
+  });
+
+// delete 子命令 (保留原有功能)
+program
+  .command('delete')
+  .description('Delete Git branches with filtering options')
   .option('-f, --filter <keyword>', 'Filter branches by keyword')
   .option('-r, --regex <pattern>', 'Filter branches by regex pattern')
   .option('--dry-run', 'Preview mode (no actual deletion)')
@@ -27,7 +45,7 @@ program
   .option('--verbose', 'Verbose output')
   .action(async (options) => {
     try {
-      await run(options);
+      await runDeleteMode(options);
     } catch (error) {
       logger.error(error instanceof Error ? error.message : 'An unknown error occurred');
       process.exit(1);
@@ -42,7 +60,33 @@ program
     Display.displayHelp();
   });
 
-async function run(options: any): Promise<void> {
+async function runBranchManager(): Promise<void> {
+  // 检查 Git 仓库
+  if (!Validator.isGitRepository()) {
+    throw new Error('Not a Git repository. Please run this command from a Git repository directory.');
+  }
+
+  // 初始化分支管理器
+  const branchManager = new BranchManager();
+  await branchManager.initialize();
+
+  // 获取分支统计信息
+  const stats = branchManager.getBranchStats();
+
+  // 显示统计信息
+  Display.displayStats(stats);
+
+  // 选择操作模式
+  const mode = await Interactive.selectBranchMode();
+  
+  if (mode === 'delete') {
+    await runDeleteMode({});
+  } else if (mode === 'switch') {
+    await runSwitchMode(branchManager);
+  }
+}
+
+async function runDeleteMode(options: any): Promise<void> {
   // 设置日志级别
   if (options.verbose) {
     logger.setVerbose(true);
@@ -70,6 +114,32 @@ async function run(options: any): Promise<void> {
   } else {
     // 交互模式
     await runInteractiveMode(branchManager);
+  }
+}
+
+async function runSwitchMode(branchManager: BranchManager): Promise<void> {
+  // 获取所有分支（包括当前分支）
+  const allBranches = branchManager.getAllBranches();
+  
+  if (allBranches.length === 0) {
+    logger.info('No branches found');
+    return;
+  }
+
+  // 显示分支列表供选择
+  Display.displayBranchList(allBranches, true);
+  
+  // 选择要切换的分支
+  const selectedBranch = await Interactive.selectBranchToSwitch(allBranches);
+  
+  if (selectedBranch) {
+    // 执行分支切换
+    const success = await branchManager.switchBranch(selectedBranch);
+    if (success) {
+      logger.info(`Successfully switched to branch: ${selectedBranch}`);
+    } else {
+      logger.error(`Failed to switch to branch: ${selectedBranch}`);
+    }
   }
 }
 

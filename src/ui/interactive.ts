@@ -258,4 +258,48 @@ export class Interactive {
 
     return answers.continue;
   }
+
+  /**
+   * 选择分支管理模式
+   */
+  static async selectBranchMode(): Promise<'delete' | 'switch'> {
+    const answers = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'mode',
+        message: 'What would you like to do with branches?',
+        choices: [
+          { name: '🗑️  Delete branches (batch delete)', value: 'delete' },
+          { name: '🔄 Switch branch (change current branch)', value: 'switch' }
+        ]
+      }
+    ]);
+
+    return answers.mode;
+  }
+
+  /**
+   * 选择要切换的分支
+   */
+  static async selectBranchToSwitch(branches: Branch[]): Promise<string | null> {
+    if (branches.length === 0) {
+      return null;
+    }
+
+    const choices = branches.map(branch => ({
+      name: this.formatBranchChoice(branch),
+      value: branch.name
+    }));
+
+    const answers = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'branch',
+        message: 'Select a branch to switch to:',
+        choices: choices
+      }
+    ]);
+
+    return answers.branch;
+  }
 }

@@ -204,4 +204,30 @@ export class Display {
     console.log('\n' + chalk.green('✅ SUCCESS:'));
     console.log(chalk.green(message));
   }
+
+  /**
+   * 显示分支列表（用于切换分支）
+   */
+  static displayBranchList(branches: Branch[], showCurrent: boolean = false): void {
+    if (branches.length === 0) {
+      console.log(chalk.yellow('No branches found'));
+      return;
+    }
+
+    console.log('\n' + chalk.cyan('🌿 AVAILABLE BRANCHES:'));
+    
+    branches.forEach((branch, index) => {
+      const prefix = this.getBranchPrefix(branch);
+      const name = this.formatBranchName(branch);
+      const details = this.getBranchDetails(branch);
+      
+      if (showCurrent && branch.isCurrent) {
+        console.log(`${prefix} ${name}${details} ${chalk.green('← CURRENT')}`);
+      } else {
+        console.log(`${prefix} ${name}${details}`);
+      }
+    });
+
+    console.log(`\n${chalk.cyan('Total branches:')} ${chalk.white(branches.length)}`);
+  }
 }

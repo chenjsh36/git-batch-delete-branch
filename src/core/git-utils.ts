@@ -183,4 +183,24 @@ export class GitUtils {
       return [];
     }
   }
+
+  /**
+   * 切换分支
+   */
+  static switchBranch(branchName: string): boolean {
+    try {
+      // 检查是否有未提交的更改
+      if (this.hasUncommittedChanges()) {
+        logger.warning('You have uncommitted changes. Please commit or stash them before switching branches.');
+        return false;
+      }
+
+      // 执行分支切换
+      execSync(`git checkout ${branchName}`, { stdio: 'ignore' });
+      return true;
+    } catch (error) {
+      logger.error(`Failed to switch to branch '${branchName}': ${error}`);
+      return false;
+    }
+  }
 }
