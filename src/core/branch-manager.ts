@@ -14,7 +14,7 @@ export class BranchManager {
   /**
    * 初始化分支管理器
    */
-  async initialize(): Promise<void> {
+  async initialize(options: { fetchRemoteInfo?: boolean; checkMergeStatus?: boolean } = {}): Promise<void> {
     try {
       // 验证 Git 仓库
       if (!Validator.isGitRepository()) {
@@ -26,8 +26,14 @@ export class BranchManager {
         throw new Error('No permission to access Git repository');
       }
 
-      // 获取所有分支
-      this.branches = GitUtils.getAllBranches();
+      // 根据选项获取分支信息
+      if (options.fetchRemoteInfo || options.checkMergeStatus) {
+        this.branches = GitUtils.getAllBranches(options);
+      } else {
+        // 快速模式：不获取远程信息，不检查合并状态
+        this.branches = GitUtils.getBranchesFast();
+      }
+      
       logger.debug(`Found ${this.branches.length} branches`);
     } catch (error) {
       logger.error(`Failed to initialize: ${error}`);

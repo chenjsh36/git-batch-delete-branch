@@ -142,6 +142,8 @@ git-batch-delete-branch --verbose
 | `--exclude` | | Exclude matching branches |
 | `--include-merged` | | Include merged branches |
 | `--verbose` | | Verbose output |
+| `--remote-info` | | Fetch remote branch information (slower but more accurate) |
+| `--check-merge` | | Check branch merge status (slower but more accurate) |
 | `--help` | `-h` | Show help information |
 | `--version` | `-v` | Show version information |
 
@@ -214,6 +216,15 @@ gitt branch
 - **Confirmation Prompts**: Users must confirm before deleting branches
 - **Preview Mode**: See what would be deleted before executing
 - **Error Handling**: Graceful handling of deletion failures
+
+## Performance Optimization
+
+The tool is designed for fast local branch operations by default:
+
+- **Fast Mode (Default)**: Only fetches local branch information, suitable for most deletion operations
+- **Detailed Mode**: Use `--remote-info` and `--check-merge` flags for accurate remote information and merge status
+
+> **Performance Tip**: For local branch cleanup, use the default fast mode. Only enable detailed mode when you need to verify merge status or remote branch information.
 
 ## Branch Status Indicators
 
