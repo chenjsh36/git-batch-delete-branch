@@ -1,6 +1,6 @@
 {
   "name": "@shopee/git-batch-delete-branch",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "A CLI tool for batch deleting Git local branches with interactive selection and filtering options",
   "main": "dist/index.js",
   "bin": {
