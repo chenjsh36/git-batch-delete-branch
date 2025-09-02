@@ -52,6 +52,32 @@ program
     }
   });
 
+// switch 子命令
+program
+  .command('switch')
+  .description('Switch to another Git branch')
+  .action(async () => {
+    try {
+      await runSwitchCommand();
+    } catch (error) {
+      logger.error(error instanceof Error ? error.message : 'An unknown error occurred');
+      process.exit(1);
+    }
+  });
+
+// merge 子命令
+program
+  .command('merge')
+  .description('Merge a branch into current branch')
+  .action(async () => {
+    try {
+      await runMergeCommand();
+    } catch (error) {
+      logger.error(error instanceof Error ? error.message : 'An unknown error occurred');
+      process.exit(1);
+    }
+  });
+
 // 帮助命令
 program
   .command('help')
@@ -139,6 +165,57 @@ async function runSwitchMode(branchManager: BranchManager): Promise<void> {
       logger.info(`Successfully switched to branch: ${selectedBranch}`);
     } else {
       logger.error(`Failed to switch to branch: ${selectedBranch}`);
+    }
+  }
+}
+
+async function runSwitchCommand(): Promise<void> {
+  // 检查 Git 仓库
+  if (!Validator.isGitRepository()) {
+    throw new Error('Not a Git repository. Please run this command from a Git repository directory.');
+  }
+
+  // 初始化分支管理器
+  const branchManager = new BranchManager();
+  await branchManager.initialize();
+
+  // 执行分支切换
+  await runSwitchMode(branchManager);
+}
+
+async function runMergeCommand(): Promise<void> {
+  // 检查 Git 仓库
+  if (!Validator.isGitRepository()) {
+    throw new Error('Not a Git repository. Please run this command from a Git repository directory.');
+  }
+
+  // 初始化分支管理器
+  const branchManager = new BranchManager();
+  await branchManager.initialize();
+
+  // 获取所有本地分支（排除当前分支）
+  const allBranches = branchManager.getAllBranches();
+  const currentBranch = branchManager.getCurrentBranch();
+  const availableBranches = allBranches.filter(branch => branch.name !== currentBranch?.name);
+  
+  if (availableBranches.length === 0) {
+    logger.info('No other branches available for merging');
+    return;
+  }
+
+  // 显示可用分支列表
+  Display.displayBranchList(availableBranches, false);
+  
+  // 选择要合并的分支
+  const selectedBranch = await Interactive.selectBranchToSwitch(availableBranches);
+  
+  if (selectedBranch) {
+    // 执行合并
+    const success = await branchManager.mergeBranch(selectedBranch);
+    if (success) {
+      logger.info(`Successfully merged branch '${selectedBranch}' into current branch '${currentBranch}'`);
+    } else {
+      logger.error(`Failed to merge branch '${selectedBranch}'`);
     }
   }
 }

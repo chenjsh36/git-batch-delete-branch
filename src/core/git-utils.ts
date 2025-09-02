@@ -215,4 +215,18 @@ export class GitUtils {
       return false;
     }
   }
+
+  /**
+   * 合并分支到当前分支
+   */
+  static mergeBranch(branchName: string): boolean {
+    try {
+      // 执行合并
+      execSync(`git merge ${branchName}`, { stdio: 'inherit' });
+      return true;
+    } catch (error) {
+      logger.error(`Failed to merge branch '${branchName}': ${error}`);
+      return false;
+    }
+  }
 }

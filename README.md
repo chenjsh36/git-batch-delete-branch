@@ -108,6 +108,32 @@ gitt branch
 
 This will show you all available branches and let you select which one to switch to.
 
+#### Direct Switch Command
+
+You can also use the dedicated switch command:
+
+```bash
+gitt switch
+```
+
+This directly opens the branch selection interface for switching.
+
+### Merge Mode
+
+Merge a branch into the current branch:
+
+```bash
+gitt merge
+```
+
+This will:
+1. Show you all available local branches (excluding the current branch)
+2. Let you select which branch to merge
+3. Perform the merge operation
+4. Handle any merge conflicts gracefully
+
+**Note**: Make sure you have committed or stashed any uncommitted changes before merging.
+
 ### Include Merged Branches
 
 By default, only unmerged branches are shown. Include merged branches:
@@ -130,6 +156,8 @@ git-batch-delete-branch --verbose
 |---------|-------------|
 | `gitt branch` | Interactive branch management (delete or switch) |
 | `gitt delete` | Delete branches with filtering options |
+| `gitt switch` | Switch to another Git branch |
+| `gitt merge` | Merge a branch into current branch |
 
 ## Options
 
@@ -205,6 +233,19 @@ git delete --regex "temp-.*|tmp-.*"
 gitt branch
 # Select "Switch branch" option
 # Choose from the list of available branches
+
+# Direct branch switching
+gitt switch
+# Choose from the list of available branches
+```
+
+### Merge Branches
+
+```bash
+# Merge a branch into current branch
+gitt merge
+# Select the branch to merge from the list
+# The selected branch will be merged into your current branch
 ```
 
 ## Safety Features
@@ -214,6 +255,9 @@ gitt branch
 - **Confirmation Prompts**: Users must confirm before deleting branches
 - **Preview Mode**: See what would be deleted before executing
 - **Error Handling**: Graceful handling of deletion failures
+- **Merge Safety**: Checks for uncommitted changes before merging
+- **Branch Validation**: Ensures branches exist before operations
+- **Conflict Handling**: Graceful handling of merge conflicts
 
 ## Branch Status Indicators
 

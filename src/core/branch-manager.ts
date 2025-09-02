@@ -271,4 +271,44 @@ export class BranchManager {
       return false;
     }
   }
+
+  /**
+   * 合并分支到当前分支
+   */
+  async mergeBranch(branchName: string): Promise<boolean> {
+    try {
+      // 检查分支是否存在
+      if (!this.branches.find(branch => branch.name === branchName)) {
+        logger.error(`Branch '${branchName}' does not exist`);
+        return false;
+      }
+
+      // 检查是否尝试合并当前分支
+      const currentBranch = this.getCurrentBranch();
+      if (currentBranch && currentBranch.name === branchName) {
+        logger.error(`Cannot merge branch '${branchName}' into itself`);
+        return false;
+      }
+
+      // 检查是否有未提交的更改
+      if (GitUtils.hasUncommittedChanges()) {
+        logger.error('Cannot merge: You have uncommitted changes. Please commit or stash them first.');
+        return false;
+      }
+
+      // 执行合并
+      const success = GitUtils.mergeBranch(branchName);
+      
+      if (success) {
+        // 刷新分支列表
+        await this.refreshBranches();
+        logger.info(`Successfully merged branch '${branchName}' into current branch`);
+      }
+      
+      return success;
+    } catch (error) {
+      logger.error(`Failed to merge branch '${branchName}': ${error}`);
+      return false;
+    }
+  }
 }
