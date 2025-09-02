@@ -43,8 +43,6 @@ program
   .option('--exclude', 'Exclude matching branches')
   .option('--include-merged', 'Include merged branches')
   .option('--verbose', 'Verbose output')
-  .option('--remote-info', 'Fetch remote branch information (slower but more accurate)')
-  .option('--check-merge', 'Check branch merge status (slower but more accurate)')
   .action(async (options) => {
     try {
       await runDeleteMode(options);
@@ -68,12 +66,9 @@ async function runBranchManager(): Promise<void> {
     throw new Error('Not a Git repository. Please run this command from a Git repository directory.');
   }
 
-  // 初始化分支管理器（快速模式：不获取远程信息）
+  // 初始化分支管理器
   const branchManager = new BranchManager();
-  await branchManager.initialize({ 
-    fetchRemoteInfo: false, 
-    checkMergeStatus: false 
-  });
+  await branchManager.initialize();
 
   // 获取分支统计信息
   const stats = branchManager.getBranchStats();
@@ -102,12 +97,9 @@ async function runDeleteMode(options: any): Promise<void> {
     throw new Error('Not a Git repository. Please run this command from a Git repository directory.');
   }
 
-  // 初始化分支管理器（根据用户选项决定是否获取远程信息）
+  // 初始化分支管理器
   const branchManager = new BranchManager();
-  await branchManager.initialize({ 
-    fetchRemoteInfo: options.remoteInfo || false, 
-    checkMergeStatus: options.checkMerge || false 
-  });
+  await branchManager.initialize();
 
   // 获取分支统计信息
   const stats = branchManager.getBranchStats();

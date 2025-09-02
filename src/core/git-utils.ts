@@ -2,45 +2,36 @@ import { execSync } from 'child_process';
 import { Branch, GitConfig } from '../types';
 import { logger } from '../utils/logger';
 
-export interface GitUtilsOptions {
-  /** 是否获取远程分支信息（主分支、合并状态等） */
-  fetchRemoteInfo?: boolean;
-  /** 是否检查分支合并状态 */
-  checkMergeStatus?: boolean;
-}
-
 export class GitUtils {
   /**
    * 获取当前 Git 配置信息
    */
-  static getGitConfig(options: GitUtilsOptions = {}): GitConfig {
+  static getGitConfig(): GitConfig {
     try {
       const currentBranch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
       const repositoryPath = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
       
-      // 根据选项决定是否获取主分支信息
+      // 尝试获取主分支名称
       let mainBranch = 'main';
-      if (options.fetchRemoteInfo) {
+      try {
+        const mainBranchResult = execSync('git symbolic-ref refs/remotes/origin/HEAD', { encoding: 'utf8' });
+        const parts = mainBranchResult.split('/');
+        const extractedBranch = parts[parts.length - 1]?.trim();
+        if (extractedBranch && extractedBranch.length > 0) {
+          mainBranch = extractedBranch;
+        }
+      } catch {
+        // 如果无法获取远程主分支，尝试本地主分支
         try {
-          const mainBranchResult = execSync('git symbolic-ref refs/remotes/origin/HEAD', { encoding: 'utf8' });
-          const parts = mainBranchResult.split('/');
-          const extractedBranch = parts[parts.length - 1]?.trim();
-          if (extractedBranch && extractedBranch.length > 0) {
-            mainBranch = extractedBranch;
-          }
+          const localMain = execSync('git branch -r | grep "origin/main"', { encoding: 'utf8' });
+          if (localMain) mainBranch = 'main';
         } catch {
-          // 如果无法获取远程主分支，尝试本地主分支
           try {
-            const localMain = execSync('git branch -r | grep "origin/main"', { encoding: 'utf8' });
-            if (localMain) mainBranch = 'main';
+            const localMaster = execSync('git branch -r | grep "origin/master"', { encoding: 'utf8' });
+            if (localMaster) mainBranch = 'master';
           } catch {
-            try {
-              const localMaster = execSync('git branch -r | grep "origin/master"', { encoding: 'utf8' });
-              if (localMaster) mainBranch = 'master';
-            } catch {
-              // 默认使用 main
-              mainBranch = 'main';
-            }
+            // 默认使用 main
+            mainBranch = 'main';
           }
         }
       }
@@ -58,9 +49,9 @@ export class GitUtils {
   /**
    * 获取所有本地分支
    */
-  static getAllBranches(options: GitUtilsOptions = {}): Branch[] {
+  static getAllBranches(): Branch[] {
     try {
-      const config = this.getGitConfig(options);
+      const config = this.getGitConfig();
       const branchesOutput = execSync('git branch --format="%(refname:short) %(HEAD) %(committerdate:iso)"', { encoding: 'utf8' });
       
       const branches: Branch[] = [];
@@ -72,17 +63,14 @@ export class GitUtils {
         const parts = line.split(' ');
         const branchName = parts[0];
         const isCurrent = parts[1] === '*';
-        const isMain = branchName === (config.mainBranch || 'main');
+        const isMain = branchName === config.mainBranch!;
         
         // 获取最后提交信息
         const lastCommit = execSync(`git log -1 --format="%h %s" ${branchName}`, { encoding: 'utf8' }).trim();
         const lastCommitDate = execSync(`git log -1 --format="%ci" ${branchName}`, { encoding: 'utf8' }).trim();
         
-        // 根据选项决定是否检查合并状态
-        let isMerged = false;
-        if (options.checkMergeStatus && config.mainBranch) {
-          isMerged = this.isBranchMerged(branchName, config.mainBranch);
-        }
+        // 检查是否已合并到主分支
+        const isMerged = this.isBranchMerged(branchName, config.mainBranch!);
         
         branches.push({
           name: branchName,
@@ -146,49 +134,9 @@ export class GitUtils {
   }
 
   /**
-   * 快速获取分支列表（仅基本信息，不检查合并状态）
-   */
-  static getBranchesFast(): Branch[] {
-    try {
-      const currentBranch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
-      const branchesOutput = execSync('git branch --format="%(refname:short) %(HEAD) %(committerdate:iso)"', { encoding: 'utf8' });
-      
-      const branches: Branch[] = [];
-      const lines = branchesOutput.trim().split('\n');
-      
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        
-        const parts = line.split(' ');
-        const branchName = parts[0];
-        const isCurrent = parts[1] === '*';
-        const isMain = branchName === 'main' || branchName === 'master'; // 简单判断
-        
-        // 获取最后提交信息
-        const lastCommit = execSync(`git log -1 --format="%h %s" ${branchName}`, { encoding: 'utf8' }).trim();
-        const lastCommitDate = execSync(`git log -1 --format="%ci" ${branchName}`, { encoding: 'utf8' }).trim();
-        
-        branches.push({
-          name: branchName,
-          isCurrent,
-          isMain,
-          lastCommit,
-          lastCommitDate,
-          isMerged: false // 默认值，不检查
-        });
-      }
-      
-      return branches;
-    } catch (error) {
-      logger.error('Failed to get branches');
-      throw error;
-    }
-  }
-
-  /**
    * 获取分支详细信息
    */
-  static getBranchInfo(branchName: string, options: GitUtilsOptions = {}): {
+  static getBranchInfo(branchName: string): {
     lastCommit: string;
     lastCommitDate: string;
     author: string;
@@ -198,9 +146,8 @@ export class GitUtils {
       const lastCommit = execSync(`git log -1 --format="%h %s" ${branchName}`, { encoding: 'utf8' }).trim();
       const lastCommitDate = execSync(`git log -1 --format="%ci" ${branchName}`, { encoding: 'utf8' }).trim();
       const author = execSync(`git log -1 --format="%an" ${branchName}`, { encoding: 'utf8' }).trim();
-      const config = this.getGitConfig(options);
-      const isMerged = options.checkMergeStatus && config.mainBranch ? 
-        this.isBranchMerged(branchName, config.mainBranch) : false;
+      const config = this.getGitConfig();
+      const isMerged = this.isBranchMerged(branchName, config.mainBranch!);
       
       return {
         lastCommit,
@@ -234,18 +181,6 @@ export class GitUtils {
       return output.trim().split('\n').filter(branch => branch.trim());
     } catch {
       return [];
-    }
-  }
-
-  /**
-   * 检查是否有未提交的更改
-   */
-  static hasUncommittedChanges(): boolean {
-    try {
-      const status = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
-      return status.length > 0;
-    } catch {
-      return false;
     }
   }
 
