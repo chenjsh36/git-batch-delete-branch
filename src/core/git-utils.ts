@@ -185,6 +185,18 @@ export class GitUtils {
   }
 
   /**
+   * 检查是否有未提交的更改
+   */
+  static hasUncommittedChanges(): boolean {
+    try {
+      const status = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
+      return status.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * 切换分支
    */
   static switchBranch(branchName: string): boolean {
